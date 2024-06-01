@@ -1,6 +1,5 @@
 pipeline{
-  agent {label 'testing_Server'}
-  agent {label 'production_Server'}
+  agent any
   environment{
       DOCKER_IMAGE = "ommaxyl/myapp:${BUILD_NUMBER}"
       EC2_USER = 'ubuntu'
