@@ -1,27 +1,9 @@
-pipeline{
+ho pipeline{
   agent any
   tools{
     maven 'Maven'
   }
-  environment{
-    IMAGE_NAME = "myapp-$BUILD_NUMBER"
-      }
   stages{
-    stage('Initial stage'){
-      steps{
-        script{
-          sh 'echo Welcome to this program'
-          sh 'git clone https://github.com/ommaxyl/mynodejs.git'
-        }
-      }
-    }
-    stage('build image'){
-      steps{
-        script{
-          sh 'echo working on building the docker image'
-        }
-      }
-    }
     stage('docker build and Push Image'){
       steps{
         script{
@@ -29,7 +11,7 @@ pipeline{
           withCredentials([usernamePassword(credentialsId: 'dockerhub-repo', passwordVariable: 'PASS', usernameVariable: 'USER')]){
               sh "docker build -t ommaxyl/myapp:${IMAGE_NAME} ."
               sh 'echo $PASS | docker login -u $USER --password-stdin'
-              sh "docker push ommaxyl/myapp:${IMAGE_NAME}"
+              sh "docker push ommaxyl/myapp:${env.BUILD_NUMBER}"
             }
         }
       }
@@ -37,7 +19,7 @@ pipeline{
     stage('deploy to ec2'){
       steps{
         script{
-          sh 'Deploying the docker image...'
+          echo 'Deploying the docker image...'
         }
       }
     }
