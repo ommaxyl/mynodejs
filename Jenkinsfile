@@ -1,5 +1,6 @@
 pipeline{
-  agent any
+  agent {label 'testing_Server'}
+  agent {label 'production_Server'}
   environment{
       DOCKER_IMAGE = "ommaxyl/myapp:${BUILD_NUMBER}"
       EC2_USER = 'ubuntu'
@@ -7,13 +8,6 @@ pipeline{
       SSH_CREDENTIALS_ID = 'ec2-ssh-key'
   }
   stages{
-    stage("test"){
-      steps{
-        script{
-          echo "Testing the Application..."
-        }
-      }
-    }
     stage('docker build and Push Image'){
       steps{
         script{
@@ -29,17 +23,18 @@ pipeline{
     stage('deploy to ec2'){
       steps{
         script{
-          echo "Deploying the docker image to EC2..."
-          sshagent([SSH_CREDENTIALS_ID]) {
-            sh 'echo "Testing SSH access to ${EC2_HOST}"'
-            sh 'ssh -v -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} "echo SSH connection established"'
-            sh """
-            ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << 'EOF'
-              docker pull ${DOCKER_IMAGE}
-              // docker stop \$(docker ps -q --filter ancestor=${DOCKER_IMAGE}) || true
-              docker run -d -p 8081:80 ${DOCKER_IMAGE}
-            'EOF'
-            """
+          def host = '54.225.8.63'
+          def prodContainerName = 'productionContainer'
+          def remoteUser = 'ubuntu'
+                    
+          sh "ssh-keyscan -H ${host} >> ~/.ssh/known_hosts"
+                     
+          sshagent(['ec2-ssh-key']) {
+              sh "ssh ${remoteUser}@${host} 'sudo docker pull ${DOCKER_IMAGE}'"
+              sh "ssh ${remoteUser}@${host} 'sudo docker stop ${prodContainerName} || true'"
+              sh "ssh ${remoteUser}@${host} 'sudo docker rm ${prodContainerName} || true'"
+              sh "ssh ${remoteUser}@${host} 'sudo docker run -d --name ${prodContainerName} -p 8081:80 ${DOCKER_IMAGE}'"
+             }
            }
          }
        }
