@@ -32,7 +32,7 @@ pipeline{
               sh "ssh ${remoteUser}@${host} 'sudo docker pull ${DOCKER_IMAGE}'"
               sh "ssh ${remoteUser}@${host} 'sudo docker stop ${prodContainerName} || true'"
               sh "ssh ${remoteUser}@${host} 'sudo docker rm ${prodContainerName} || true'"
-              sh "ssh ${remoteUser}@${host} 'sudo docker run -d --name ${prodContainerName} -p 81:80 ${DOCKER_IMAGE}'"
+              sh "ssh ${remoteUser}@${host} 'sudo docker run -d --name ${prodContainerName} -p 8081:80 ${DOCKER_IMAGE}'"
              }
            }
          }
