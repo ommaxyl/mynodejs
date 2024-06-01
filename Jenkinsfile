@@ -8,7 +8,7 @@ pipeline{
       steps{
         script{
           sh 'echo Welcome to this program'
-          sh 'git clone 
+          sh 'git clone https://github.com/ommaxyl/mynodejs.git'
         }
       }
     }
