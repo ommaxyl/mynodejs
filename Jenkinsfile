@@ -3,6 +3,9 @@ pipeline{
   tools{
     maven 'Maven'
   }
+  environment{
+    IMAGE_NAME = "myapp-$BUILD_NUMBER"
+      }
   stages{
     stage('Initial stage'){
       steps{
