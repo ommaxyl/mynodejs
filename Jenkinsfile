@@ -36,7 +36,7 @@ pipeline{
             sh """
             ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << 'EOF'
               docker pull ${DOCKER_IMAGE}
-              docker stop \$(docker ps -q --filter ancestor=${DOCKER_IMAGE}) || true
+              // docker stop \$(docker ps -q --filter ancestor=${DOCKER_IMAGE}) || true
               docker run -d -p 8081:80 ${DOCKER_IMAGE}
             'EOF'
             """
