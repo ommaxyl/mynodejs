@@ -21,7 +21,7 @@ pipeline{
               sh "docker build -t ommaxyl/myapp:${env.BUILD_NUMBER} ."
               sh "echo $PASS | docker login -u $USER --password-stdin"
               sh "docker push ommaxyl/myapp:${env.BUILD_NUMBER}"
-              env.DOCKER_IMAGE = "ommaxyl/myapp:${env.BUILD_NUMBER}"
+              def env.DOCKER_IMAGE = "ommaxyl/myapp:${env.BUILD_NUMBER}"
             }
         }
       }
@@ -31,11 +31,13 @@ pipeline{
         script{
           echo "Deploying the docker image..."
           sshagent([SSH_CREDENTIALS_ID]) {
+            sh 'echo "Testing SSH access to ${EC2_HOST}"'
+            sh 'ssh -v -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} "echo SSH connection established"'
             sh """
-              ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << 'EOF'
-              docker pull ${env.DOCKER_IMAGE}
-              docker stop \$(docker ps -q --filter ancestor=${env.DOCKER_IMAGE}) || true
-              docker run -d -p 80:80 ${env.DOCKER_IMAGE}
+            ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << 'EOF'
+              docker pull ${DOCKER_IMAGE}
+              docker stop \$(docker ps -q --filter ancestor=${DOCKER_IMAGE}) || true
+              docker run -d -p 80:80 ${DOCKER_IMAGE}
             EOF
             """
            }
@@ -46,7 +48,7 @@ pipeline{
   post{
     always{
       cleanWs()
-   }
+    }
   }
 }
 
