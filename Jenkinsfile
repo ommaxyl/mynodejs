@@ -6,6 +6,13 @@ pipeline{
       SSH_CREDENTIALS_ID = 'ec2-ssh-key'
   }
   stages{
+    stage("test"){
+      steps{
+        script{
+          echo "Testing the Application..."
+        }
+      }
+    }
     stage('docker build and Push Image'){
       steps{
         script{
@@ -22,13 +29,13 @@ pipeline{
     stage('deploy to ec2'){
       steps{
         script{
-          echo 'Deploying the docker image...'
+          echo "Deploying the docker image..."
           sshagent([SSH_CREDENTIALS_ID]) {
             sh """
-              ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << EOF
-              docker pull ${DOCKER_IMAGE}
-              docker stop \$(docker ps -q --filter ancestor=${DOCKER_IMAGE}) || true
-              docker run -d -p 80:80 ${DOCKER_IMAGE}
+              ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << 'EOF'
+              docker pull ${env.DOCKER_IMAGE}
+              docker stop \$(docker ps -q --filter ancestor=${env.DOCKER_IMAGE}) || true
+              docker run -d -p 80:80 ${env.DOCKER_IMAGE}
             EOF
             """
            }
@@ -36,5 +43,10 @@ pipeline{
        }
      }
    }
- }
+  post{
+    always{
+      cleanWs()
+   }
+  }
+}
 
