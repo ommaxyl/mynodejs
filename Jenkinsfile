@@ -29,7 +29,7 @@ pipeline{
     stage('deploy to ec2'){
       steps{
         script{
-          echo "Deploying the docker image..."
+          echo "Deploying the docker image to EC2..."
           sshagent([SSH_CREDENTIALS_ID]) {
             sh 'echo "Testing SSH access to ${EC2_HOST}"'
             sh 'ssh -v -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} "echo SSH connection established"'
@@ -38,7 +38,7 @@ pipeline{
               docker pull ${DOCKER_IMAGE}
               docker stop \$(docker ps -q --filter ancestor=${DOCKER_IMAGE}) || true
               docker run -d -p 8081:80 ${DOCKER_IMAGE}
-            EOF
+            'EOF'
             """
            }
          }
