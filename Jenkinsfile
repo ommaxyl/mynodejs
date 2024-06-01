@@ -11,7 +11,7 @@ pipeline{
         script{
           echo "building the docker image and pushing to dockerhub..."
           withCredentials([usernamePassword(credentialsId: 'dockerhub-repo', passwordVariable: 'PASS', usernameVariable: 'USER')]){
-              sh "docker build -t ommaxyl/myapp:${IMAGE_NAME} ."
+              sh "docker build -t ommaxyl/myapp:${env.BUILD_NUMBER} ."
               sh "echo $PASS | docker login -u $USER --password-stdin"
               sh "docker push ommaxyl/myapp:${env.BUILD_NUMBER}"
               env.DOCKER_IMAGE = "ommaxyl/myapp:${env.BUILD_NUMBER}"
