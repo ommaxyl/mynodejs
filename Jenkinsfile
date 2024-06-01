@@ -21,7 +21,7 @@ pipeline{
               sh "docker build -t ommaxyl/myapp:${env.BUILD_NUMBER} ."
               sh "echo $PASS | docker login -u $USER --password-stdin"
               sh "docker push ommaxyl/myapp:${env.BUILD_NUMBER}"
-              def env.DOCKER_IMAGE = "ommaxyl/myapp:${env.BUILD_NUMBER}"
+              env.DOCKER_IMAGE = "ommaxyl/myapp:${env.BUILD_NUMBER}"
             }
         }
       }
