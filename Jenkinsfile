@@ -15,7 +15,7 @@ pipeline{
     stage('build image'){
       steps{
         script{
-          sh 
+          sh 'echo working on building the docker image'
         }
       }
     }
